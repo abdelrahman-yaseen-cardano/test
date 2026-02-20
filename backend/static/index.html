@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loop Engine</title>
+
+  <!-- Import Map: maps bare specifiers to esm.sh CDN -->
+  <script type="importmap">
+  {
+    "imports": {
+      "react":                    "https://esm.sh/react@18.3.1?dev",
+      "react/":                   "https://esm.sh/react@18.3.1/",
+      "react-dom":                "https://esm.sh/react-dom@18.3.1?dev",
+      "react-dom/client":         "https://esm.sh/react-dom@18.3.1/client?dev",
+      "react-dom/":               "https://esm.sh/react-dom@18.3.1/",
+      "@xyflow/react":            "https://esm.sh/@xyflow/react@12.4.3?deps=react@18.3.1,react-dom@18.3.1&dev",
+      "zustand":                  "https://esm.sh/zustand@5.0.3?dev",
+      "zustand/vanilla":          "https://esm.sh/zustand@5.0.3/vanilla?dev",
+      "zustand/middleware":       "https://esm.sh/zustand@5.0.3/middleware?dev",
+      "axios":                    "https://esm.sh/axios@1.7.9",
+      "clsx":                     "https://esm.sh/clsx@2.1.1",
+      "htm":                      "https://esm.sh/htm@3.1.1"
+    }
+  }
+  </script>
+
+  <!-- ReactFlow styles -->
+  <link rel="stylesheet" href="https://esm.sh/@xyflow/react@12.4.3/dist/style.css" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/static/main.js"></script>
+</body>
+</html>

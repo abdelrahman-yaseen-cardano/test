@@ -1,0 +1,6 @@
+npm ERR! code UNABLE_TO_GET_ISSUER_CERT_LOCALLY
+npm ERR! errno UNABLE_TO_GET_ISSUER_CERT_LOCALLY
+npm ERR! request to https://registry.npmjs.org/@types%2freact failed, reason: unable to get local issuer certificate
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     C:\Users\yaseen-rahman-ramada\AppData\Local\npm-cache\_logs\2026-02-20T11_10_07_208Z-debug-0.log

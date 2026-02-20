@@ -1,0 +1,7 @@
+Starting npm install...
+npm ERR! code FETCH_ERROR
+npm ERR! errno FETCH_ERROR
+npm ERR! invalid json response body at https://zswpmanager.glb.mmc.com/cgi-bin/notice?url=https%3a%2f%2fregistry%2enpmjs%2eorg%2f%40types%252freact&referer=&reason=Not+allowed+to+browse+MMC+Block+Notice+category&reasoncode=CATEGORY_DENIED&timebound=1&action=deny&kind=category&rule=1510677&cat=MMC+Block+Notice&user=yaseen.abdelrahman@cardano.com&locid=00000000&lang=en_US&zsq=qNDSQ70qPn4wqJksQPsRvq1t7rTHZNr7jQs3RPFzsq reason: Unexpected token < in JSON at position 9
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     C:\Users\yaseen-rahman-ramada\AppData\Local\npm-cache\_logs\2026-02-20T11_20_12_698Z-debug-0.log

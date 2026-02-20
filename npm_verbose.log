@@ -1,0 +1,80 @@
+npm verb cli C:\Program Files (x86)\blp\bqnt\environments\bqnt-3\node.exe C:\Program Files (x86)\blp\bqnt\environments\bqnt-3\node_modules\npm\bin\npm-cli.js
+npm info using npm@8.19.2
+npm info using node@v18.12.1
+npm timing npm:load:whichnode Completed in 0ms
+npm timing config:load:defaults Completed in 1ms
+npm timing config:load:file:C:\Program Files (x86)\blp\bqnt\environments\bqnt-3\node_modules\npm\npmrc Completed in 2ms
+npm timing config:load:builtin Completed in 2ms
+npm timing config:load:cli Completed in 2ms
+npm timing config:load:env Completed in 1ms
+npm timing config:load:file:C:\projects\loop-engine\frontend\.npmrc Completed in 0ms
+npm timing config:load:project Completed in 4ms
+npm timing config:load:file:C:\Users\yaseen-rahman-ramada\.npmrc Completed in 0ms
+npm timing config:load:user Completed in 0ms
+npm timing config:load:file:C:\Program Files (x86)\blp\bqnt\environments\bqnt-3\etc\npmrc Completed in 0ms
+npm timing config:load:global Completed in 0ms
+npm timing config:load:validate Completed in 0ms
+npm timing config:load:credentials Completed in 1ms
+npm timing config:load:setEnvs Completed in 1ms
+npm timing config:load Completed in 12ms
+npm timing npm:load:configload Completed in 13ms
+npm timing npm:load:mkdirpcache Completed in 0ms
+npm timing npm:load:mkdirplogs Completed in 1ms
+npm verb title npm install
+npm verb argv "install" "--loglevel" "verbose"
+npm timing npm:load:setTitle Completed in 1ms
+npm timing config:load:flatten Completed in 4ms
+npm timing npm:load:display Completed in 11ms
+npm verb logfile logs-max:10 dir:C:\Users\yaseen-rahman-ramada\AppData\Local\npm-cache\_logs
+npm verb logfile C:\Users\yaseen-rahman-ramada\AppData\Local\npm-cache\_logs\2026-02-20T11_18_28_212Z-debug-0.log
+npm timing npm:load:logFile Completed in 8ms
+npm timing npm:load:timers Completed in 0ms
+npm timing npm:load:configScope Completed in 0ms
+npm timing npm:load Completed in 34ms
+npm timing arborist:ctor Completed in 0ms
+npm timing arborist:ctor Completed in 0ms
+npm timing idealTree:init Completed in 13ms
+npm timing idealTree:userRequests Completed in 0ms
+npm timing idealTree:#root Completed in 983824ms
+npm timing idealTree:node_modules/@types/react Completed in 0ms
+npm timing idealTree:node_modules/@types/react-dom Completed in 0ms
+npm timing idealTree:node_modules/@vitejs/plugin-react Completed in 0ms
+npm timing idealTree:node_modules/@xyflow/react Completed in 0ms
+npm timing idealTree:node_modules/autoprefixer Completed in 0ms
+npm timing idealTree:node_modules/axios Completed in 0ms
+npm timing idealTree:node_modules/clsx Completed in 0ms
+npm timing idealTree:node_modules/postcss Completed in 0ms
+npm timing idealTree:node_modules/react Completed in 0ms
+npm timing idealTree:node_modules/react-dom Completed in 0ms
+npm timing idealTree:node_modules/tailwindcss Completed in 0ms
+npm timing idealTree:node_modules/typescript Completed in 0ms
+npm timing idealTree:node_modules/vite Completed in 0ms
+npm timing idealTree:node_modules/zustand Completed in 0ms
+npm timing idealTree:buildDeps Completed in 983827ms
+npm timing idealTree:fixDepFlags Completed in 0ms
+npm timing idealTree Completed in 983843ms
+npm timing command:install Completed in 983851ms
+npm verb type system
+npm verb stack FetchError: request to https://registry.npmjs.org/@types%2freact failed, reason: unable to get local issuer certificate
+npm verb stack     at ClientRequest.<anonymous> (C:\Program Files (x86)\blp\bqnt\environments\bqnt-3\node_modules\npm\node_modules\minipass-fetch\lib\index.js:130:14)
+npm verb stack     at ClientRequest.emit (node:events:513:28)
+npm verb stack     at TLSSocket.socketErrorListener (node:_http_client:494:9)
+npm verb stack     at TLSSocket.emit (node:events:525:35)
+npm verb stack     at emitErrorNT (node:internal/streams/destroy:151:8)
+npm verb stack     at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+npm verb stack     at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+npm verb cwd C:\projects\loop-engine\frontend
+npm verb Windows_NT 10.0.26100
+npm verb node v18.12.1
+npm verb npm  v8.19.2
+npm ERR! code UNABLE_TO_GET_ISSUER_CERT_LOCALLY
+npm ERR! errno UNABLE_TO_GET_ISSUER_CERT_LOCALLY
+npm ERR! request to https://registry.npmjs.org/@types%2freact failed, reason: unable to get local issuer certificate
+npm verb exit 1
+npm timing npm Completed in 984111ms
+npm verb unfinished npm timer reify 1771586308470
+npm verb unfinished npm timer reify:loadTrees 1771586308474
+npm verb code 1
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     C:\Users\yaseen-rahman-ramada\AppData\Local\npm-cache\_logs\2026-02-20T11_18_28_212Z-debug-0.log
