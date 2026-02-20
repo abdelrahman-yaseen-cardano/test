@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class VideoNodeData(BaseModel):
     id: str
     name: str
+    original_filename: str = ''   # original upload filename, never mutated by rename
     type: Literal["video"] = "video"
     video_url: str
     first_frame_url: str
@@ -55,6 +56,7 @@ class ExportRequest(BaseModel):
 class ExportEntry(BaseModel):
     node_id: str
     name: str
+    original_filename: str = ''   # original upload filename
     type: str
     video_url: str
     duration: float

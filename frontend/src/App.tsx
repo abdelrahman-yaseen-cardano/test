@@ -4,10 +4,17 @@ import { NodeEditor } from './components/NodeEditor'
 import { UploadZone } from './components/UploadZone'
 import { FramePreviewModal } from './components/FramePreviewModal'
 import { ExportPanel } from './components/ExportPanel'
+import { LinearTimeline } from './components/LinearTimeline'
+import { GroupExpandModal } from './components/GroupExpandModal'
+import { VideoPreviewModal } from './components/VideoPreviewModal'
 
 export default function App() {
   const showExport = useStore((s) => s.showExport)
   const setShowExport = useStore((s) => s.setShowExport)
+  const showLinearTimeline = useStore((s) => s.showLinearTimeline)
+  const setShowLinearTimeline = useStore((s) => s.setShowLinearTimeline)
+  const expandedGroupId = useStore((s) => s.expandedGroupId)
+  const timelineSlots = useStore((s) => s.timelineSlots)
   const ssimThreshold = useStore((s) => s.ssimThreshold)
   const setThreshold = useStore((s) => s.setThreshold)
 
@@ -38,6 +45,26 @@ export default function App() {
             />
             <span className="text-xs font-mono text-text w-8">{ssimThreshold.toFixed(2)}</span>
           </div>
+
+          {/* Timeline button */}
+          <button
+            onClick={() => setShowLinearTimeline(true)}
+            className="
+              px-4 py-1.5 rounded-lg text-xs font-semibold
+              bg-surface border border-border text-text hover:bg-surfaceHover
+              transition-colors flex items-center gap-1.5 relative
+            "
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M3 12h12M3 18h8" />
+            </svg>
+            Timeline
+            {timelineSlots.length > 0 && (
+              <span className="ml-0.5 text-[10px] font-bold bg-primary text-white rounded-full px-1.5 py-0">
+                {timelineSlots.length}
+              </span>
+            )}
+          </button>
 
           {/* Export button */}
           <button
@@ -74,6 +101,9 @@ export default function App() {
               <li>• <span className="text-text">Shift+click</span> to multi-select nodes, then group them</li>
               <li>• A node can connect to <span className="text-success">itself</span> if first ≈ last frame</li>
               <li>• Adjust threshold slider to change matching strictness</li>
+              <li>• <span className="text-text">Double-click</span> a group to expand its contents</li>
+              <li>• Click <span className="text-primary">+TL</span> on a node to add it to the linear timeline</li>
+              <li>• Open <span className="text-text">Timeline</span> to reorder, duplicate, or validate the sequence</li>
             </ul>
           </div>
         </aside>
@@ -88,6 +118,9 @@ export default function App() {
 
       {/* ── Modals ────────────────────────────────────── */}
       <FramePreviewModal />
+      <VideoPreviewModal />
+      {expandedGroupId && <GroupExpandModal />}
+      {showLinearTimeline && <LinearTimeline onClose={() => setShowLinearTimeline(false)} />}
       {showExport && <ExportPanel onClose={() => setShowExport(false)} />}
     </div>
   )

@@ -12,8 +12,13 @@ import {
   type EdgeChange,
   type Connection,
 } from '@xyflow/react'
-import type { NodeData, VideoNodeData, GroupNodeData, SimilarityResult, ActiveKnob, ExportCycle, ExportResponse } from '../types'
+import type {
+  NodeData, VideoNodeData, GroupNodeData, SimilarityResult,
+  ActiveKnob, ExportCycle, ExportResponse, TimelineSlot, EdgeWaypoint,
+} from '../types'
 import * as api from '../api/client'
+
+const newId = () => crypto.randomUUID()
 
 // ──────────────────────────────────────────────
 // Store shape
@@ -33,11 +38,18 @@ interface LoopEngineState {
   ssimThreshold: number
   setThreshold: (t: number) => void
 
+  // Similarity matrix (from backend) — used by linear timeline
+  similarityMatrix: Record<string, Record<string, number>>
+  fetchSimilarityMatrix: () => Promise<void>
+
   // UI
   selectedNodeIds: string[]
   previewFrame: { url: string; label: string } | null
+  previewVideo: { url: string; name: string } | null
   showTimeline: boolean
   showExport: boolean
+  showLinearTimeline: boolean
+  expandedGroupId: string | null
 
   // Actions
   loadInitialData: () => Promise<void>
@@ -50,8 +62,26 @@ interface LoopEngineState {
   clearActiveKnob: () => void
   openFramePreview: (url: string, label: string) => void
   closeFramePreview: () => void
+  openVideoPreview: (url: string, name: string) => void
+  closeVideoPreview: () => void
   setShowTimeline: (v: boolean) => void
   setShowExport: (v: boolean) => void
+  setShowLinearTimeline: (v: boolean) => void
+  setExpandedGroupId: (id: string | null) => void
+
+  // Edge waypoints
+  updateEdgeWaypoint: (edgeId: string, wpIndex: number, pos: { x: number; y: number }) => void
+  addEdgeWaypoint: (edgeId: string, pos: { x: number; y: number }) => void
+  removeEdgeWaypoint: (edgeId: string, wpIndex: number) => void
+
+  // Linear timeline
+  timelineSlots: TimelineSlot[]
+  addToTimeline: (nodeId: string) => void
+  duplicateInTimeline: (slotId: string) => void
+  removeFromTimeline: (slotId: string) => void
+  moveSlotLeft: (slotId: string) => void
+  moveSlotRight: (slotId: string) => void
+  getTimelineCompatibility: () => { slotId: string; compatible: boolean; score: number }[]
 
   // Export
   exportCycles: ExportCycle[]
@@ -101,8 +131,13 @@ export const useStore = create<LoopEngineState>((set, get) => ({
   ssimThreshold: 0.75,
   selectedNodeIds: [],
   previewFrame: null,
+  previewVideo: null,
   showTimeline: false,
   showExport: false,
+  showLinearTimeline: false,
+  expandedGroupId: null,
+  similarityMatrix: {},
+  timelineSlots: [],
   exportCycles: [],
   exportResult: null,
 
@@ -122,8 +157,25 @@ export const useStore = create<LoopEngineState>((set, get) => ({
   },
 
   onConnect: (connection: Connection) => {
-    set((s) => ({ edges: addEdge({ ...connection, animated: true }, s.edges) }))
+    const isSelfLoop = connection.source === connection.target
+    set((s) => ({
+      edges: addEdge(
+        { ...connection, animated: true, data: { isSelfLoop, waypoints: [] as EdgeWaypoint[] } },
+        s.edges,
+      ),
+    }))
     get().clearActiveKnob()
+  },
+
+  // ── Similarity matrix ─────────────────────
+
+  fetchSimilarityMatrix: async () => {
+    try {
+      const matrix = await api.getSimilarityMatrix()
+      set({ similarityMatrix: matrix })
+    } catch (e) {
+      console.error('Failed to fetch similarity matrix', e)
+    }
   },
 
   // ── Data loading ──────────────────────────
@@ -135,6 +187,7 @@ export const useStore = create<LoopEngineState>((set, get) => ({
       makeFlowNode(d, autoLayout(all.length, i)),
     )
     set({ nodes })
+    get().fetchSimilarityMatrix()
   },
 
   // ── Upload ────────────────────────────────
@@ -148,6 +201,7 @@ export const useStore = create<LoopEngineState>((set, get) => ({
       )
       return { nodes: [...s.nodes, ...flowNodes] }
     })
+    get().fetchSimilarityMatrix()
   },
 
   // ── Rename ────────────────────────────────
@@ -168,6 +222,7 @@ export const useStore = create<LoopEngineState>((set, get) => ({
     set((s) => ({
       nodes: s.nodes.filter((n) => n.id !== id),
       edges: s.edges.filter((e) => e.source !== id && e.target !== id),
+      timelineSlots: s.timelineSlots.filter((sl) => sl.nodeId !== id),
     }))
   },
 
@@ -243,6 +298,10 @@ export const useStore = create<LoopEngineState>((set, get) => ({
       edges: s.edges.filter(
         (e) => !selSet.has(e.source) || !selSet.has(e.target),
       ),
+      // Remap timeline slots from child nodes to the new group
+      timelineSlots: s.timelineSlots.map((sl) =>
+        selSet.has(sl.nodeId) ? { ...sl, nodeId: group.id } : sl,
+      ),
     }))
   },
 
@@ -268,6 +327,7 @@ export const useStore = create<LoopEngineState>((set, get) => ({
         return {
           nodes: [...s.nodes.filter((n) => n.id !== groupId), ...newNodes],
           edges: s.edges.filter((e) => e.source !== groupId && e.target !== groupId),
+          timelineSlots: s.timelineSlots.filter((sl) => sl.nodeId !== groupId),
         }
       })
     })
@@ -295,17 +355,109 @@ export const useStore = create<LoopEngineState>((set, get) => ({
     set({ activeKnob: null, compatibleHandles: [] })
   },
 
-  // ── Frame preview ─────────────────────────
+  // ── Frame / video preview ─────────────────
 
   openFramePreview: (url, label) => set({ previewFrame: { url, label } }),
   closeFramePreview: () => set({ previewFrame: null }),
+  openVideoPreview: (url, name) => set({ previewVideo: { url, name } }),
+  closeVideoPreview: () => set({ previewVideo: null }),
+
+  // ── Group expansion ───────────────────────
+
+  setExpandedGroupId: (id) => set({ expandedGroupId: id }),
 
   // ── Panels ────────────────────────────────
 
   setShowTimeline: (v) => set({ showTimeline: v }),
   setShowExport: (v) => set({ showExport: v }),
+  setShowLinearTimeline: (v) => set({ showLinearTimeline: v }),
   setThreshold: (t) => set({ ssimThreshold: t }),
   setExportCycles: (c) => set({ exportCycles: c }),
+
+  // ── Edge waypoints ────────────────────────
+
+  updateEdgeWaypoint: (edgeId, wpIndex, pos) => {
+    set((s) => ({
+      edges: s.edges.map((e) => {
+        if (e.id !== edgeId) return e
+        const wps: EdgeWaypoint[] = [...((e.data?.waypoints as EdgeWaypoint[]) ?? [])]
+        wps[wpIndex] = pos
+        return { ...e, data: { ...e.data, waypoints: wps } }
+      }),
+    }))
+  },
+
+  addEdgeWaypoint: (edgeId, pos) => {
+    set((s) => ({
+      edges: s.edges.map((e) => {
+        if (e.id !== edgeId) return e
+        const wps: EdgeWaypoint[] = [...((e.data?.waypoints as EdgeWaypoint[]) ?? []), pos]
+        return { ...e, data: { ...e.data, waypoints: wps } }
+      }),
+    }))
+  },
+
+  removeEdgeWaypoint: (edgeId, wpIndex) => {
+    set((s) => ({
+      edges: s.edges.map((e) => {
+        if (e.id !== edgeId) return e
+        const wps: EdgeWaypoint[] = ((e.data?.waypoints as EdgeWaypoint[]) ?? []).filter((_, i) => i !== wpIndex)
+        return { ...e, data: { ...e.data, waypoints: wps } }
+      }),
+    }))
+  },
+
+  // ── Linear timeline ───────────────────────
+
+  addToTimeline: (nodeId) => {
+    set((s) => ({
+      timelineSlots: [...s.timelineSlots, { slotId: newId(), nodeId }],
+    }))
+  },
+
+  duplicateInTimeline: (slotId) => {
+    const { timelineSlots } = get()
+    const idx = timelineSlots.findIndex((sl) => sl.slotId === slotId)
+    if (idx === -1) return
+    const newSlot: TimelineSlot = { slotId: newId(), nodeId: timelineSlots[idx].nodeId }
+    const next = [...timelineSlots]
+    next.splice(idx + 1, 0, newSlot)
+    set({ timelineSlots: next })
+  },
+
+  removeFromTimeline: (slotId) => {
+    set((s) => ({
+      timelineSlots: s.timelineSlots.filter((sl) => sl.slotId !== slotId),
+    }))
+  },
+
+  moveSlotLeft: (slotId) => {
+    const { timelineSlots } = get()
+    const idx = timelineSlots.findIndex((sl) => sl.slotId === slotId)
+    if (idx <= 0) return
+    const next = [...timelineSlots]
+    ;[next[idx - 1], next[idx]] = [next[idx], next[idx - 1]]
+    set({ timelineSlots: next })
+  },
+
+  moveSlotRight: (slotId) => {
+    const { timelineSlots } = get()
+    const idx = timelineSlots.findIndex((sl) => sl.slotId === slotId)
+    if (idx === -1 || idx >= timelineSlots.length - 1) return
+    const next = [...timelineSlots]
+    ;[next[idx], next[idx + 1]] = [next[idx + 1], next[idx]]
+    set({ timelineSlots: next })
+  },
+
+  getTimelineCompatibility: () => {
+    const { timelineSlots, similarityMatrix, ssimThreshold } = get()
+    return timelineSlots.map((slot, idx) => {
+      if (idx === 0) return { slotId: slot.slotId, compatible: true, score: 1 }
+      const prev = timelineSlots[idx - 1]
+      const score = similarityMatrix[prev.nodeId]?.[slot.nodeId] ?? 0
+      return { slotId: slot.slotId, compatible: score >= ssimThreshold, score }
+    })
+  },
 
   // ── Export ────────────────────────────────
 

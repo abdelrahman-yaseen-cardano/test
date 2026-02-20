@@ -118,6 +118,7 @@ function camelifyNode(d: any): VideoNodeData {
   return {
     id: d.id,
     name: d.name,
+    originalFilename: d.original_filename ?? '',
     type: 'video',
     videoUrl: d.video_url,
     firstFrameUrl: d.first_frame_url,

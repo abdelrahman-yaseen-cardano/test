@@ -56,6 +56,7 @@ async def export_sequence(payload: ExportRequest):
                         ExportEntry(
                             node_id=nid,
                             name=node_data["name"],
+                            original_filename=node_data.get("original_filename", ""),
                             type=node_data.get("type", "video"),
                             video_url=node_data["video_url"],
                             duration=dur,

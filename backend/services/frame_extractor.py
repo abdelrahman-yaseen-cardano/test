@@ -92,8 +92,16 @@ def _extract_last_frame_cv2(video_path: str, out_path: str) -> None:
 
 
 def load_frame_array(frame_path: str, size: tuple[int, int] = (256, 256)) -> np.ndarray:
-    """Load a frame image, resize, return grayscale numpy array (H, W)."""
+    """Load a frame image, resize, return grayscale numpy array (H, W) in [0,1]."""
     img = cv2.imread(frame_path, cv2.IMREAD_GRAYSCALE)
     if img is None:
         raise FileNotFoundError(f"Frame not found: {frame_path}")
     return cv2.resize(img, size, interpolation=cv2.INTER_AREA).astype(np.float32) / 255.0
+
+
+def load_color_frame_array(frame_path: str, size: tuple[int, int] = (256, 256)) -> np.ndarray:
+    """Load a frame image, resize, return BGR uint8 numpy array (H, W, 3)."""
+    img = cv2.imread(frame_path, cv2.IMREAD_COLOR)
+    if img is None:
+        return np.zeros((*size, 3), dtype=np.uint8)
+    return cv2.resize(img, size, interpolation=cv2.INTER_AREA)

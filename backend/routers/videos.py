@@ -68,6 +68,7 @@ async def upload_videos(
         node = VideoNodeData(
             id=node_id,
             name=Path(upload.filename).stem,
+            original_filename=upload.filename or '',
             video_url=f"/uploads/videos/{video_path.name}",
             first_frame_url=f"/uploads/frames/{node_id}_first.jpg",
             last_frame_url=f"/uploads/frames/{node_id}_last.jpg",
